@@ -56,3 +56,40 @@ exports.checkLoginBody = [
 
   checkExact([], { message: "Invalid data" }),
 ];
+
+exports.checkCreateAuthorBody = [
+  body("name").trim().notEmpty().withMessage("Name is required!"),
+
+  body("birthDate")
+    .trim()
+    .isISO8601("yyyy-mm-dd")
+    .withMessage("Invalid date format!"),
+
+  body("biography").trim().optional(),
+
+  checkExact([], { message: "Invalid data" }),
+];
+
+exports.checkUpdateAuthorBody = [
+  body("name").trim().optional(),
+
+  body("birthDate")
+    .trim()
+    .optional()
+    .isISO8601("yyyy-mm-dd")
+    .withMessage("Invalid date format!"),
+
+  body("biography").trim().optional(),
+
+  checkExact([], { message: "Invalid data" }),
+
+  body().custom((value, { req }) => {
+    const { name, birthDate, biography } = req.body;
+
+    if (!name && !birthDate && !biography) {
+      throw new Error("No data to update!");
+    }
+
+    return true;
+  }),
+];

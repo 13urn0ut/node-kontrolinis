@@ -1,6 +1,11 @@
 const jwt = require("jsonwebtoken");
 const argon2 = require("argon2");
-const { register, getUserByUsername } = require("../models/userModel");
+const {
+  register,
+  getUserByUsername,
+  getUserById,
+} = require("../models/userModel");
+const AppError = require("../utils/appError");
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -23,7 +28,11 @@ exports.register = async (req, res, next) => {
 
     const hashedPassword = await argon2.hash(password);
 
-    const newUser = await register({ username, password: hashedPassword });
+    const newUser = await register({
+      username,
+      password: hashedPassword,
+      role: "user",
+    });
 
     newUser.password = undefined;
     newUser.id = undefined;
@@ -57,4 +66,45 @@ exports.login = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
+
+exports.protect = async (req, res, next) => {
+  try {
+    const token = req.cookies?.jwt;
+
+    if (!token) {
+      return next(new AppError("You are not logged in! Please log in", 401));
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    const currentUser = await getUserById(decoded.id);
+
+    if (!currentUser) {
+      return next(
+        new AppError(
+          "The user belonging to this token does no longer exist",
+          401
+        )
+      );
+    }
+
+    req.user = currentUser;
+
+    next();
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.allowAccessTo = (...roles) => {
+  return (req, res, next) => {
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError("You do not have permission to perform this action", 403)
+      );
+    }
+
+    next();
+  };
 };

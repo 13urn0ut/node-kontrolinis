@@ -20,3 +20,13 @@ exports.getUserByUsername = async (username) => {
 
   return user;
 };
+
+exports.getUserById = async (id) => {
+  const [user] = await sql`
+  SELECT *
+  FROM users
+  WHERE users.id = ${id}
+  `;
+
+  return user;
+};
