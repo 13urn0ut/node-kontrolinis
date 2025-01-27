@@ -16,6 +16,7 @@ export default [
         "error",
         {
           endOfLine: "auto",
+          trailingComma: "es5",
         },
       ],
 

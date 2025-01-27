@@ -1,12 +1,16 @@
 const express = require("express");
-const Router = require("./routers/Router");
+const cookieParser = require("cookie-parser");
+const authRouter = require("./routers/authRouter");
 const errorHandler = require("./middleware/errorHandler");
 const AppError = require("./utils/appError");
 const app = express();
 
 app.use(express.json());
+app.use(cookieParser());
 
-app.use("/api/v1", Router);
+app.use("/api/v1/auth", authRouter);
+// app.use("/api/v1/books", bookRouter);
+// app.use("/api/v1/authors", authorRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError("Not found", 404));
