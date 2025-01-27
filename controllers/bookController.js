@@ -9,7 +9,9 @@ const AppError = require("../utils/appError");
 
 exports.getAllBooks = async (req, res, next) => {
   try {
-    const books = await getAllBooks();
+    const filter = req.query;
+
+    const books = await getAllBooks(filter);
 
     if (!books || books.length === 0) throw new AppError("No books found", 404);
 
@@ -41,9 +43,14 @@ exports.getBookById = async (req, res, next) => {
 
 exports.createBook = async (req, res, next) => {
   try {
-    const book = req.body;
+    const { title, summary, isbn, authorId: author_id } = req.body;
 
-    const newBook = await createBook(book);
+    const newBook = await createBook({
+      title,
+      summary: summary ? summary : null,
+      isbn,
+      author_id,
+    });
 
     if (!newBook) throw new AppError("Error creating book", 500);
 

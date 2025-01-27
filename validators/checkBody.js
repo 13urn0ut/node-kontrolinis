@@ -62,7 +62,7 @@ exports.checkLoginBody = [
 exports.checkCreateAuthorBody = [
   body("name").trim().notEmpty().withMessage("Name is required!"),
 
-  body("birthDate")
+  body("birth_date")
     .trim()
     .isISO8601("yyyy-mm-dd")
     .withMessage("Invalid date format!"),
@@ -75,7 +75,7 @@ exports.checkCreateAuthorBody = [
 exports.checkUpdateAuthorBody = [
   body("name").trim().optional(),
 
-  body("birthDate")
+  body("birth_date")
     .trim()
     .optional()
     .isISO8601("yyyy-mm-dd")
@@ -129,7 +129,7 @@ exports.checkCreateBookBody = [
       return true;
     }),
 
-  body("authorId")
+  body("author_id")
     .trim()
     .notEmpty()
     .withMessage("Author ID is required!")
@@ -180,7 +180,7 @@ exports.checkUpdateBookBody = [
       return true;
     }),
 
-  body("authorId")
+  body("author_id")
     .trim()
     .optional()
     .isNumeric()

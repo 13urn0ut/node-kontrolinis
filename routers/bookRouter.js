@@ -13,11 +13,12 @@ const {
   checkUpdateBookBody,
 } = require("../validators/checkBody");
 const { checkParamsId } = require("../validators/checkParams");
+const { checkQuery } = require("../validators/checkQuery");
 const validate = require("../validators/validate");
 
 bookRouter
   .route("/")
-  .get(getAllBooks)
+  .get(checkQuery, validate, getAllBooks)
   .post(
     protect,
     allowAccessTo("admin"),

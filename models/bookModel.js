@@ -11,12 +11,29 @@ exports.createBook = async (book) => {
   return newBook;
 };
 
-exports.getAllBooks = async () => {
+exports.getAllBooks = async (filter) => {
+  const limit = filter?.limit;
+  const page = filter?.page;
+  const offset = (page - 1) * limit;
+
   const books = await sql`
-    SELECT books.*, authors.* 
+    SELECT books.id as book_id, books.title, books.summary, books.isbn, authors.*
     FROM books
     JOIN authors
     ON books.author_id = authors.id
+    ${
+      filter?.title
+        ? sql`WHERE books.title LIKE '%${sql.unsafe(filter.title)}%'`
+        : sql``
+    }
+    ${
+      filter?.authorId
+        ? filter?.title
+          ? sql`AND books.author_id = ${filter.authorId}`
+          : sql`WHERE books.author_id = ${filter.authorId}`
+        : sql``
+    }  
+    ${limit && offset >= 0 ? sql`LIMIT ${limit} OFFSET ${offset}` : sql``}
     `;
 
   return books;
