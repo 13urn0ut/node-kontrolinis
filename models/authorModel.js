@@ -1,7 +1,7 @@
 const { sql } = require("../dbConnection");
 
 exports.getAllAuthors = async () => {
-  const [authors] = await sql`
+  const authors = await sql`
     SELECT authors.*
     FROM authors
     `;

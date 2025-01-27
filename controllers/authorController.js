@@ -5,14 +5,19 @@ const {
   updateAuthor,
   deleteAuthor,
 } = require("../models/authorModel");
+const { getBooksByAuthorId } = require("../models/bookModel");
 const AppError = require("../utils/appError");
 
 exports.getAllauthors = async (req, res, next) => {
   try {
-    const authors = await getAllAuthors();
+    let authors = await getAllAuthors();
 
     if (!authors || authors.length === 0)
       throw new AppError("No authors found", 404);
+
+    for (const author of authors) {
+      author.books = await getBooksByAuthorId(author.id);
+    }
 
     res.status(200).json({
       status: "success",
@@ -30,6 +35,8 @@ exports.getAuthorById = async (req, res, next) => {
     const author = await getAuthorById(id);
 
     if (!author) throw new AppError("No author found", 404);
+
+    author.books = await getBooksByAuthorId(author.id);
 
     res.status(200).json({
       status: "success",

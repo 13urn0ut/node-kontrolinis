@@ -13,8 +13,10 @@ exports.createBook = async (book) => {
 
 exports.getAllBooks = async () => {
   const books = await sql`
-    SELECT books.*
+    SELECT books.*, authors.* 
     FROM books
+    JOIN authors
+    ON books.author_id = authors.id
     `;
 
   return books;
@@ -22,8 +24,10 @@ exports.getAllBooks = async () => {
 
 exports.getBookById = async (id) => {
   const [book] = await sql`
-    SELECT books.*
+    SELECT books.*, authors.*
     FROM books
+    JOIN authors
+    ON books.author_id = authors.id
     WHERE books.id = ${id}
     `;
 
