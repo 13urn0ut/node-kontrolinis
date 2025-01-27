@@ -10,6 +10,7 @@ const {
   checkCreateAuthorBody,
   checkUpdateAuthorBody,
 } = require("../validators/checkBody");
+const { checkParamsId } = require("../validators/checkParams");
 const validate = require("../validators/validate");
 
 const authorRouter = require("express").Router();
@@ -27,6 +28,7 @@ authorRouter
 
 authorRouter
   .route("/:id")
+  .all(checkParamsId, validate)
   .get(getAuthorById)
   .patch(
     protect,

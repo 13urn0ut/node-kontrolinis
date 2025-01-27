@@ -66,6 +66,8 @@ exports.updateAuthor = async (req, res, next) => {
 
     const updatedAuthor = await updateAuthor(id, author);
 
+    if (!updatedAuthor) throw new AppError("No author found", 404);
+
     res.status(200).json({
       status: "success",
       data: updatedAuthor,

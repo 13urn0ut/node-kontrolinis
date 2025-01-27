@@ -35,7 +35,6 @@ exports.register = async (req, res, next) => {
     });
 
     newUser.password = undefined;
-    newUser.id = undefined;
 
     res.status(201).json({
       status: "success",
@@ -57,7 +56,6 @@ exports.login = async (req, res, next) => {
     sendCookie(res, token);
 
     user.password = undefined;
-    user.id = undefined;
 
     res.status(200).json({
       status: "success",

@@ -1,6 +1,8 @@
 const argon2 = require("argon2");
 const { body, checkExact } = require("express-validator");
 const { getUserByUsername } = require("../models/userModel");
+const { getAuthorById } = require("../models/authorModel");
+const { getAllBooks } = require("../models/bookModel");
 
 exports.checkRegisterBody = [
   body("username")
@@ -87,6 +89,118 @@ exports.checkUpdateAuthorBody = [
     const { name, birthDate, biography } = req.body;
 
     if (!name && !birthDate && !biography) {
+      throw new Error("No data to update!");
+    }
+
+    return true;
+  }),
+];
+
+exports.checkCreateBookBody = [
+  body("title")
+    .trim()
+    .notEmpty()
+    .isLength({ min: 3 })
+    .withMessage("Title must be at least 3 characters long!"),
+
+  body("summary").optional().trim(),
+
+  body("isbn")
+    .trim()
+    .notEmpty()
+    .withMessage("ISBN is required!")
+    .matches(/^[0-9-]+$/)
+    .withMessage("Invalid ISBN format!")
+    .custom(async (isbn) => {
+      const digits = isbn.replace(/-/g, "");
+
+      if (digits.length !== 10) {
+        throw new Error("Invalid ISBN format!");
+      }
+
+      const books = await getAllBooks();
+
+      const isbns = books.map((book) => book.isbn);
+
+      if (isbns.includes(isbn)) {
+        throw new Error("ISBN already exists!");
+      }
+
+      return true;
+    }),
+
+  body("authorId")
+    .trim()
+    .notEmpty()
+    .withMessage("Author ID is required!")
+    .isNumeric()
+    .withMessage("Author ID must be a number!")
+    .custom(async (authorId) => {
+      const author = await getAuthorById(authorId);
+
+      if (!author) {
+        throw new Error("Invalid author ID!");
+      }
+
+      return true;
+    }),
+
+  checkExact([], { message: "Invalid data" }),
+];
+
+exports.checkUpdateBookBody = [
+  body("title")
+    .trim()
+    .optional()
+    .isLength({ min: 3 })
+    .withMessage("Title must be at least 3 characters long!"),
+
+  body("summary").trim().optional(),
+
+  body("isbn")
+    .trim()
+    .optional()
+    .matches(/^[0-9-]+$/)
+    .withMessage("Invalid ISBN format!")
+    .custom(async (isbn) => {
+      const digits = isbn.replace(/-/g, "");
+
+      if (digits.length !== 10) {
+        throw new Error("Invalid ISBN format!");
+      }
+
+      const books = await getAllBooks();
+
+      const isbns = books.map((book) => book.isbn);
+
+      if (isbns.includes(isbn)) {
+        throw new Error("ISBN already exists!");
+      }
+
+      return true;
+    }),
+
+  body("authorId")
+    .trim()
+    .optional()
+    .isNumeric()
+    .withMessage("Author ID must be a number!")
+    .custom(async (authorId) => {
+      const author = await getAuthorById(authorId);
+
+      if (!author) {
+        throw new Error("Invalid author ID!");
+      }
+
+      return true;
+    }),
+
+  checkExact([], { message: "Invalid data" }),
+
+  body().custom((value, { req }) => {
+    const { title, summary, isbn, authorId } = req.body;
+
+    if (!title && !summary && !isbn && !authorId) {
       throw new Error("No data to update!");
     }
 

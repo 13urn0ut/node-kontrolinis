@@ -2,6 +2,7 @@ const express = require("express");
 const cookieParser = require("cookie-parser");
 const authRouter = require("./routers/authRouter");
 const authorRouter = require("./routers/authorRouter");
+const bookRouter = require("./routers/bookRouter");
 const errorHandler = require("./middleware/errorHandler");
 const AppError = require("./utils/appError");
 const app = express();
@@ -10,7 +11,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/api/v1/auth", authRouter);
-// app.use("/api/v1/books", bookRouter);
+app.use("/api/v1/books", bookRouter);
 app.use("/api/v1/authors", authorRouter);
 
 app.all("*", (req, res, next) => {
